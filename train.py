@@ -137,7 +137,7 @@ def _train(
     is_tekken = vocab_size > 32768
 
     instruct_tokenizer: InstructTokenizerBase = MistralTokenizer.v3(
-        is_tekken=is_tekken
+        # is_tekken=is_tekken
     ).instruct_tokenizer  # type: ignore
 
     # 7. Load data loaders
