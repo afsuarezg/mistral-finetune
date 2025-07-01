@@ -7,5 +7,4 @@ tensorboard
 tqdm
 
 torch==2.2
-triton==2.2
 xformers==0.0.24
