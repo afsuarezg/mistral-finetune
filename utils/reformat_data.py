@@ -77,6 +77,8 @@ def reformat_jsonl(input_file):
             else:
                 print(f"Skipped {idx}th sample")
 
+    if os.path.exists(input_file):
+        os.remove(input_file)
     os.rename(output_file, input_file)
 
 

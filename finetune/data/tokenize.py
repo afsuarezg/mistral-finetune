@@ -22,7 +22,8 @@ from mistral_common.protocol.instruct.validator import (
 )
 from mistral_common.tokens.instruct.request import InstructRequest
 from mistral_common.tokens.tokenizers.base import Tokenizer
-from mistral_common.tokens.tokenizers.sentencepiece import InstructTokenizerBase
+# from mistral_common.tokens.tokenizers.sentencepiece import InstructTokenizerBase
+from mistral_common.tokens.tokenizers.instruct import InstructTokenizerBase
 
 from .exceptions import (
     ConversationFormatError,

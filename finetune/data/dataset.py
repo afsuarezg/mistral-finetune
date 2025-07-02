@@ -12,8 +12,10 @@ from mistral_common.protocol.instruct.messages import (
     FinetuningAssistantMessage,
     SystemMessage,
 )
-from mistral_common.tokens.tokenizers.sentencepiece import InstructTokenizerBase
-
+# from mistral_common.tokens.tokenizers.sentencepiece import InstructTokenizerBase
+from mistral_common.tokens.tokenizers.instruct import InstructTokenizerBase
+#6e63743
+#d93e786 nov 15, 2024
 from finetune.distributed import get_rank
 
 from .args import InstructArgs
