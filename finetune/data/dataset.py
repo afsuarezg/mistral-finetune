@@ -5,6 +5,7 @@ import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Union
+import pdb
 
 import numpy as np
 import torch.distributed as dist
@@ -110,6 +111,7 @@ def parse_data_sources(
     pretrain_data: str,
     instruct_data: str,
 ) -> Tuple[List[Union[DataDir, DataFile]], List[float]]:
+    # pdb.set_trace()
     seen: Set[str] = set()
     sources: List[Union[DataDir, DataFile]] = []
     weights: List[float] = []
@@ -117,6 +119,9 @@ def parse_data_sources(
         (pretrain_data, SampleType.PRETRAIN),
         (instruct_data, SampleType.INSTRUCT),
     ]:
+        print('breapoint')
+        # breakpoint()
+        pdb.set_trace()
         for source in sample_sources.strip().split(","):
             if not source:
                 continue
