@@ -12,6 +12,7 @@ import platform
 import pandas as pd
 import yaml
 import shutil
+import pprint
 from pathlib import Path
 from dotenv import load_dotenv
 from huggingface_hub import login, snapshot_download
@@ -152,6 +153,10 @@ def create_training_config(data_dir, model_path):
         "run_dir": str(Path.cwd() / "mistral_models" / "test_ultra")
     }
     
+    # Pretty print the configuration
+    print("Configuration:")
+    pprint.pprint(config, indent=2, width=80)
+    
     # Save configuration
     with open('example.yaml', 'w') as file:
         yaml.dump(config, file, default_flow_style=False)
@@ -274,18 +279,18 @@ def main():
     
     # Setup environment
     setup_environment()
-    
+    breakpoint()
     # Download model (uncomment if needed)
     # model_path = download_model()
     model_path = Path.cwd().joinpath('mistral_models', '7B-v0.3')
     
     # Prepare dataset (uncomment if needed)
-    data_dir = prepare_dataset()
+    # data_dir = prepare_dataset()
     data_dir = Path.cwd().joinpath('data')
     
     # Reformat data (uncomment if needed)
     reformat_data(data_dir)
-    
+    breakpoint()
     # Create training configuration
     config = create_training_config(data_dir, model_path)
     

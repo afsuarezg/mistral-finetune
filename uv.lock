@@ -1082,6 +1082,7 @@ dependencies = [
     { name = "ipykernel" },
     { name = "jupyter" },
     { name = "mistral-common" },
+    { name = "mistral-inference" },
     { name = "notebook" },
     { name = "numpy" },
     { name = "pandas" },
@@ -1104,6 +1105,7 @@ requires-dist = [
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "jupyter", specifier = ">=1.1.1" },
     { name = "mistral-common", specifier = ">=1.3.1" },
+    { name = "mistral-inference", specifier = ">=1.6.0" },
     { name = "notebook", specifier = ">=7.4.4" },
     { name = "numpy", specifier = "<2.0" },
     { name = "pandas", specifier = ">=2.3.0" },
@@ -1116,6 +1118,23 @@ requires-dist = [
     { name = "torch", specifier = "==2.2" },
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "xformers", specifier = "==0.0.24" },
+]
+
+[[package]]
+name = "mistral-inference"
+version = "1.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fire" },
+    { name = "mistral-common" },
+    { name = "pillow" },
+    { name = "safetensors" },
+    { name = "simple-parsing" },
+    { name = "xformers" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2b/ac/51c055749fa67e94444717bd163adc2d02dc7164d9746e58694b6952ddbc/mistral_inference-1.6.0.tar.gz", hash = "sha256:838ef36cdb8f0fe970df1f9e5d270d8c174081eaa9acda77534b187e27b0d5b3", size = 30769 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/74/77/55c3935c593f430b72930358f61c99553e7895d59041a4666cfefb5ee463/mistral_inference-1.6.0-py3-none-any.whl", hash = "sha256:ab55f27381836d81e67b323eea21bc0f5f483a9eff8c603d04d9fabde925e836", size = 32063 },
 ]
 
 [[package]]
