@@ -342,6 +342,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+    breakpoint()
     parser = argparse.ArgumentParser(description="Validate jsonl.")
     parser.add_argument(
         "--train_yaml",
