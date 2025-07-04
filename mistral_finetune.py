@@ -169,25 +169,43 @@ def start_training():
     """Start the training process."""
     print("Starting training...")
     
-    # Set up environment for single-process training
-    try:
-        # Set environment variables for single-process distributed training
+    # Check if we're on Windows
+    if platform.system() == "Windows":
+        print("Windows detected - using alternative training approach...")
+        
+        # Set environment variables to simulate distributed training
         os.environ["MASTER_ADDR"] = "localhost"
         os.environ["MASTER_PORT"] = "29500"
         os.environ["WORLD_SIZE"] = "1"
         os.environ["RANK"] = "0"
         os.environ["LOCAL_RANK"] = "0"
+        os.environ["TORCHELASTIC_RESTART_COUNT"] = "0"
         
-        # Use torchrun with single process for Windows compatibility
-        # This should work better than direct python execution
-        os.system('torchrun --nproc-per-node=1 --master-port=29500 -m train example.yaml')
-    except Exception as e:
-        print(f"Training failed: {e}")
-        print("Note: Distributed training has limitations on Windows.")
-        print("Alternative solutions:")
-        print("1. Use WSL2 (Windows Subsystem for Linux)")
-        print("2. Run training manually with: torchrun --nproc-per-node=1 -m train example.yaml")
-        print("3. Consider using a cloud service or Linux environment")
+        # Try direct Python execution instead of torchrun
+        try:
+            print("Attempting direct Python execution...")
+            os.system('python -m train example.yaml')
+        except Exception as e:
+            print(f"Direct execution failed: {e}")
+            print("\n=== WINDOWS TRAINING LIMITATIONS ===")
+            print("PyTorch distributed training has known issues on Windows.")
+            print("\nRecommended solutions:")
+            print("1. Use WSL2 (Windows Subsystem for Linux):")
+            print("   - Install WSL2 from Microsoft Store")
+            print("   - Install Ubuntu on WSL2")
+            print("   - Run your training there")
+            print("\n2. Use Google Colab (free):")
+            print("   - Upload your code to Google Colab")
+            print("   - Run training in the cloud")
+            print("\n3. Use a cloud service (AWS, Azure, etc.)")
+            print("\n4. Manual command (if you want to try):")
+            print("   torchrun --nproc-per-node=1 --master-port=29500 -m train example.yaml")
+    else:
+        # For non-Windows systems, use normal torchrun
+        try:
+            os.system('torchrun --nproc-per-node=1 -m train example.yaml')
+        except Exception as e:
+            print(f"Training failed: {e}")
 
 
 def save_model_to_drive():
@@ -303,8 +321,8 @@ def main():
 
     # Create training configuration
     config = create_training_config(data_dir, model_path)
-    breakpoint()    
-    # Start training (uncomment if needed)
+    
+    # Start training
     start_training()
     
     # Setup inference
