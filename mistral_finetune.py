@@ -50,7 +50,7 @@ def download_model():
     print("Setting up model directory...")
     
     # Change to project directory
-    os.chdir(r'C:\Users\Andres.DESKTOP-D77KM25\Documents\Legal tech projects\Mistral-Finetune\mistral-finetune')
+    os.chdir(r'C:\Users\Andres.DESKTOP-D77KM25\Documents\Legal_tech_projects\Mistral-Finetune\mistral-finetune')
     print(f"Current directory: {os.getcwd()}")
     
     # Create model directory
@@ -128,7 +128,7 @@ def create_training_config(data_dir, model_path):
     config = {
         "data": {
             "instruct_data": str(data_dir / "ultrachat_chunk_train.jsonl"),
-            "data": "/content/drive/My Drive/Mistral/Data/output.jsonl",  # Optional pretraining data
+            "data": None,  #"/content/drive/My Drive/Mistral/Data/output.jsonl",  # Optional pretraining data
             "eval_instruct_data": str(data_dir / "ultrachat_chunk_eval.jsonl")
         },
         "model_id_or_path": str(model_path),
@@ -169,14 +169,25 @@ def start_training():
     """Start the training process."""
     print("Starting training...")
     
-    # Note: This command may not work on Windows due to distributed training limitations
-    # You might need to run this manually or use a different approach
+    # Set up environment for single-process training
     try:
-        os.system('torchrun --nproc-per-node 1 -m train example.yaml')
+        # Set environment variables for single-process distributed training
+        os.environ["MASTER_ADDR"] = "localhost"
+        os.environ["MASTER_PORT"] = "29500"
+        os.environ["WORLD_SIZE"] = "1"
+        os.environ["RANK"] = "0"
+        os.environ["LOCAL_RANK"] = "0"
+        
+        # Use torchrun with single process for Windows compatibility
+        # This should work better than direct python execution
+        os.system('torchrun --nproc-per-node=1 --master-port=29500 -m train example.yaml')
     except Exception as e:
         print(f"Training failed: {e}")
-        print("Note: Distributed training may not work on Windows.")
-        print("Consider running the training command manually or using WSL2.")
+        print("Note: Distributed training has limitations on Windows.")
+        print("Alternative solutions:")
+        print("1. Use WSL2 (Windows Subsystem for Linux)")
+        print("2. Run training manually with: torchrun --nproc-per-node=1 -m train example.yaml")
+        print("3. Consider using a cloud service or Linux environment")
 
 
 def save_model_to_drive():
@@ -279,7 +290,6 @@ def main():
     
     # Setup environment
     setup_environment()
-    breakpoint()
     # Download model (uncomment if needed)
     # model_path = download_model()
     model_path = Path.cwd().joinpath('mistral_models', '7B-v0.3')
@@ -290,12 +300,12 @@ def main():
     
     # Reformat data (uncomment if needed)
     reformat_data(data_dir)
-    breakpoint()
+
     # Create training configuration
     config = create_training_config(data_dir, model_path)
-    
+    breakpoint()    
     # Start training (uncomment if needed)
-    # start_training()
+    start_training()
     
     # Setup inference
     setup_inference()
