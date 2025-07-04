@@ -21,7 +21,7 @@ dependencies = [
     "safetensors>=0.5.3",
     "simple-parsing>=0.1.7",
     "tensorboard>=2.19.0",
-    "torch==2.2",
+    #"torch==2.2",
     "tqdm>=4.67.1",
     "xformers==0.0.24",
 ]
