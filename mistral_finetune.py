@@ -13,6 +13,7 @@ import pandas as pd
 import yaml
 import shutil
 import pprint
+import subprocess
 from pathlib import Path
 from dotenv import load_dotenv
 from huggingface_hub import login, snapshot_download
@@ -118,7 +119,14 @@ def reformat_data(data_dir):
     print("Reformatting evaluation data...")
     os.system(f'python -m utils.reformat_data "{eval_file}"')
     
+    # Validate the reformatted data
+    print("Validating reformatted data...")
+    os.system('python -m utils.validate_data --train_yaml example/7B.yaml')
+
     print("Data reformatting complete")
+
+
+
 
 
 def create_training_config(data_dir, model_path):
@@ -307,26 +315,34 @@ def main():
     print("=== Mistral 7B Fine-tuning Script ===")
     
     # Setup environment
+    print("\n Setting up environment...")
     setup_environment()
+    
     # Download model (uncomment if needed)
+    print("\nDownloading model...")
     # model_path = download_model()
     model_path = Path.cwd().joinpath('mistral_models', '7B-v0.3')
     
     # Prepare dataset (uncomment if needed)
     # data_dir = prepare_dataset()
+    print("\nPreparing dataset...")
     data_dir = Path.cwd().joinpath('data')
     
     # Reformat data (uncomment if needed)
+    print("\nReformatting data...")
     reformat_data(data_dir)
 
     # Create training configuration
-    config = create_training_config(data_dir, model_path)
+    # print("\nCreating training configuration...")
+    # config = create_training_config(data_dir, model_path)
     
     # Start training
-    start_training()
+    # print("\nStarting training...")
+    # start_training()
     
     # Setup inference
-    setup_inference()
+    # print("\nSetting up inference...")
+    # setup_inference()
     
     # Run inference (uncomment if needed)
     # lora_path = Path.cwd().joinpath('mistral_models', 'test_ultra', 'checkpoints', 'checkpoint_000100', 'consolidated', 'lora.safetensors')

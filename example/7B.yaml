@@ -1,11 +1,11 @@
 # data
 data:
-  instruct_data: "C:/Users/Andres.DESKTOP-D77KM25/Documents/Legal tech projects/Mistral-Finetune/mistral-finetune/data/ultrachat_chunk_train.jsonl"  # Fill
+  instruct_data: "/Users/Andres.DESKTOP-D77KM25/Documents/Legal_tech_projects/Mistral-Finetune/mistral-finetune/data/ultrachat_chunk_train.jsonl"  # Fill
   data: ""  # Optionally fill with pretraining data 
-  eval_instruct_data: "C:/Users/Andres.DESKTOP-D77KM25/Documents/Legal tech projects/Mistral-Finetune/mistral-finetune/data/ultrachat_chunk_eval.jsonl"  # Optionally fill
+  eval_instruct_data: "/Users/Andres.DESKTOP-D77KM25/Documents/Legal_tech_projects/Mistral-Finetune/mistral-finetune/data/ultrachat_chunk_eval.jsonl"  # Optionally fill
 
 # model
-model_id_or_path: "C:/Users/Andres.DESKTOP-D77KM25/Documents/Legal tech projects/Mistral-Finetune/mistral-finetune/mistral_models"
+model_id_or_path: "/Users/Andres.DESKTOP-D77KM25/Documents/Legal_tech_projects/Mistral-Finetune/mistral-finetune/mistral_models"
 lora:
   rank: 64
 

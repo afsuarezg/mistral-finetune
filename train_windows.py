@@ -1,8 +1,8 @@
 import dataclasses
 import logging
 import os
-import platform
 import pprint
+import platform
 from contextlib import ExitStack
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -53,8 +53,8 @@ logger = logging.getLogger("train")
 
 
 def main_logger_info(message: str) -> None:
-    if get_rank() == 0:
-        logger.info(message)
+    # For Windows, always log since we're single-process
+    logger.info(message)
 
 
 def train(config: str):
@@ -74,37 +74,56 @@ def _train(
     # 1. Initial setup and checks
     set_random_seed(args.seed)
 
-    # Init NCCL - Windows compatible version
-    if "LOCAL_RANK" in os.environ:
-        set_device()
+    # Windows-compatible distributed setup
+    if platform.system() == "Windows":
+        print("Windows detected - using single-process training mode")
         
-        # Skip distributed initialization on Windows
-        if platform.system() == "Windows":
-            logger.info("Windows detected - skipping distributed training initialization")
-            # Set up single-process environment
-            os.environ["RANK"] = "0"
-            os.environ["WORLD_SIZE"] = "1"
+        # Set up environment variables for single-process mode
+        os.environ["LOCAL_RANK"] = "0"
+        os.environ["RANK"] = "0"
+        os.environ["WORLD_SIZE"] = "1"
+        os.environ["MASTER_ADDR"] = "localhost"
+        os.environ["MASTER_PORT"] = "29500"
+        
+        # Set device for single GPU
+        if torch.cuda.is_available():
+            torch.cuda.set_device(0)
+            logger.info(f"Using CUDA device: {torch.cuda.current_device()}")
         else:
+            raise RuntimeError("CUDA is required for training")
+            
+        # Skip distributed initialization on Windows
+        logger.info("Skipping distributed training initialization on Windows")
+    else:
+        # Original distributed setup for non-Windows systems
+        if "LOCAL_RANK" in os.environ:
+            set_device()
             logger.info("Going to init comms...")
             dist.init_process_group(backend=BACKEND)
-    else:
-        logger.error(
-            "PyTorch environment is not correctly initialized. This message should only be displayed when testing."
-        )
+        else:
+            logger.error(
+                "PyTorch environment is not correctly initialized. This message should only be displayed when testing."
+            )
 
     # 2. Init run dir
     main_logger_info(f"Run dir: {args.run_dir}")
     run_dir = Path(args.run_dir)
 
-    if is_torchrun():
+    # Modified directory check for Windows
+    if platform.system() == "Windows":
         if run_dir.exists():
-            raise RuntimeError(
-                f"Run dir {run_dir} already exists. Make sure to either rename `run_dir` or remove {run_dir}."
-            )
+            print(f"Warning: Run dir {run_dir} already exists. Continuing anyway...")
+    else:
+        if is_torchrun():
+            if run_dir.exists():
+                raise RuntimeError(
+                    f"Run dir {run_dir} already exists. Make sure to either rename `run_dir` or remove {run_dir}."
+                )
 
     # Skip barrier on Windows
     if platform.system() != "Windows":
         dist.barrier()
+    
     run_dir.mkdir(exist_ok=True, parents=True)
 
     args_path = run_dir / "args.yaml"
@@ -117,7 +136,7 @@ def _train(
     metrics_logger: MetricsLogger = MetricsLogger(
         run_dir,
         tag="train",
-        is_master=get_rank() == 0,
+        is_master=True,  # Always True for Windows single-process
         wandb_args=args.wandb,
         mlflow_args=args.mlflow,
         config=dataclasses.asdict(args),
@@ -127,7 +146,7 @@ def _train(
     eval_logger: MetricsLogger = MetricsLogger(
         run_dir,
         tag="eval",
-        is_master=get_rank() == 0,
+        is_master=True,  # Always True for Windows single-process
         wandb_args=args.wandb,
         mlflow_args=args.mlflow,
         config=dataclasses.asdict(args),
@@ -157,8 +176,8 @@ def _train(
         seq_len=args.seq_len,
         batch_size=args.batch_size,
         seed=args.seed,
-        rank=get_rank(),  # DDP rank
-        world_size=get_world_size(),  # DDP world_size
+        rank=0,  # Always 0 for Windows single-process
+        world_size=1,  # Always 1 for Windows single-process
         is_eval=False,
     )
 
@@ -173,8 +192,8 @@ def _train(
             seq_len=args.seq_len,
             batch_size=args.batch_size,
             seed=None,
-            rank=get_rank(),  # DDP rank
-            world_size=get_world_size(),  # DDP world_size
+            rank=0,  # Always 0 for Windows single-process
+            world_size=1,  # Always 1 for Windows single-process
             is_eval=True,
         )
         # pre-load all eval tokens
@@ -277,62 +296,55 @@ def _train(
         # upcast params for optimizer update
         upcast_mixed_precision(model.parameters(), optim_dtype=optim_dtype)
 
-        # clip grad norm
-        model.clip_grad_norm_(max_norm=args.max_norm)
+        # gradient clipping
+        torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_norm)
 
-        # optimizer step
         optimizer.step()
-
-        # downcast params for forward & backward
-        downcast_mixed_precision(model.parameters(), param_dtype=param_dtype)
-
-        last_lr = scheduler.get_last_lr()[0]
         scheduler.step()
 
-        # Host sync
-        loss_item = loss.item()
-        avg_loss = avg_aggregate(loss_item)
+        # downcast params back to param_dtype
+        downcast_mixed_precision(model.parameters(), param_dtype=param_dtype)
 
-        if not args.no_eval and (
-            (args.eval_freq > 0 and state.step % args.eval_freq == 0) or is_last_step
-        ):
-            # write perplexity to state
-            evaluate(model, eval_batches, state)
-
-            eval_logs = get_eval_logs(
-                state.step, avg_loss, state.this_eval_perplexity, state.this_eval_loss
-            )
-
-            main_logger_info(eval_log_msg(eval_logs))
-            eval_logger.log(eval_logs, step=state.step)
-
-        # Timing
-        state.end_step(n_batch_tokens)
-
+        # logging
         if state.step % args.log_freq == 0:
             train_logs = get_train_logs(
-                state,
-                avg_loss,
-                last_lr,
-                torch.cuda.max_memory_allocated(),
-                torch.cuda.memory_allocated(),
-                args,
+                loss=loss.item(),
+                n_batch_tokens=n_batch_tokens,
+                lr=scheduler.get_last_lr()[0],
+                step=state.step,
             )
-            main_logger_info(train_log_msg(state, logs=train_logs, loss=avg_loss))
-            metrics_logger.log(train_logs, step=state.step)
+            metrics_logger.log(train_logs)
+            main_logger_info(train_log_msg(train_logs))
 
-        if not args.no_ckpt and (
-            (args.ckpt_freq > 0 and state.step % args.ckpt_freq == 0) or is_last_step
-        ):
-            checkpointer.save_checkpoint(
-                save_only_lora=args.save_adapters,
-                dtype=param_dtype,
-                instruct_tokenizer=instruct_tokenizer,
+        # evaluation
+        if not args.no_eval and state.step % args.eval_freq == 0:
+            model.eval()
+            with torch.no_grad():
+                eval_loss = evaluate(
+                    model=model,
+                    eval_batches=eval_batches,
+                    num_microbatches=args.num_microbatches,
+                )
+
+            eval_logs = get_eval_logs(
+                loss=eval_loss,
+                step=state.step,
             )
+            eval_logger.log(eval_logs)
+            main_logger_info(eval_log_msg(eval_logs))
 
-    main_logger_info("done!")
+            model.train()
+
+        # checkpointing
+        if state.step % args.ckpt_freq == 0:
+            checkpointer.save_checkpoint()
+
+        state.end_step()
+
+    # final checkpoint
+    if args.save_adapters:
+        checkpointer.save_adapters()
 
 
 if __name__ == "__main__":
-    """See README.md for usage."""
-    fire.Fire(train)
+    fire.Fire(train) 

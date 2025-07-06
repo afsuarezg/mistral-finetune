@@ -112,6 +112,7 @@ def parse_data_sources(
     instruct_data: str,
 ) -> Tuple[List[Union[DataDir, DataFile]], List[float]]:
     # pdb.set_trace()
+    # breakpoint()
     seen: Set[str] = set()
     sources: List[Union[DataDir, DataFile]] = []
     weights: List[float] = []
@@ -130,7 +131,7 @@ def parse_data_sources(
                 path_ = source_items[0]
                 weight = 1.0
             elif len(source_items) == 2:
-                path_, weight_ = source_items
+                path_, weight_ = source_items##
                 weight = float(weight_)
             else:
                 raise ValueError(

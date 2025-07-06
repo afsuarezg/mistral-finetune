@@ -176,6 +176,7 @@ def main(args):
     instruct_tokenizer = MistralTokenizer.v3().instruct_tokenizer
 
     for name, pretrain_file, instruct_file in data:
+        # breakpoint()
         datasets, weights = parse_data_sources(pretrain_file, instruct_file)
         data_types = [d.sample_type for d in datasets]
         datasets = [str(d.path) for d in datasets]
@@ -342,7 +343,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    breakpoint()
     parser = argparse.ArgumentParser(description="Validate jsonl.")
     parser.add_argument(
         "--train_yaml",
@@ -370,4 +370,5 @@ if __name__ == "__main__":
         help="Skip faulty lines and append all correct lines to `.corrected` datasets.",
     )
     args = parser.parse_args()
+    # breakpoint()
     main(args)

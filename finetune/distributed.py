@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 from functools import lru_cache
 from typing import List, Union
 
@@ -13,12 +14,24 @@ BACKEND = "nccl"
 
 @lru_cache()
 def get_rank() -> int:
-    return dist.get_rank()
+    # Windows-compatible rank detection
+    if platform.system() == "Windows" and "RANK" in os.environ:
+        return int(os.environ["RANK"])
+    try:
+        return dist.get_rank()
+    except:
+        return 0
 
 
 @lru_cache()
 def get_world_size() -> int:
-    return dist.get_world_size()
+    # Windows-compatible world size detection
+    if platform.system() == "Windows" and "WORLD_SIZE" in os.environ:
+        return int(os.environ["WORLD_SIZE"])
+    try:
+        return dist.get_world_size()
+    except:
+        return 1
 
 
 def visible_devices() -> List[int]:

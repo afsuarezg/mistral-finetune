@@ -178,6 +178,7 @@ def build_instruct_sample(data: Dict[str, Any]) -> TrainingInstructSample:
 
     # validate created messages
     validator = MistralRequestValidatorV3(ValidationMode.finetuning)
+    breakpoint()
     validator.validate_messages(messages)
     validator._validate_tools(available_tools or [])
 
