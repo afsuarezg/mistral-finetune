@@ -214,7 +214,7 @@ def start_training():
         # For non-Windows systems, use normal torchrun
         try:
             print("\nTraining with torchrun...")
-            os.system('torchrun --nproc-per-node=1 -m train example.yaml')
+            os.system('torchrun --nproc-per-node 1 -m train example.yaml')
         except Exception as e:
             print(f"Training failed: {e}")
 
