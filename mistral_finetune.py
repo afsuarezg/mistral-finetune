@@ -330,15 +330,15 @@ def main():
     
     # Reformat data (uncomment if needed)
     print("\nReformatting data...")
-    reformat_data(data_dir)
+    # reformat_data(data_dir)
 
     # Create training configuration
-    # print("\nCreating training configuration...")
-    # config = create_training_config(data_dir, model_path)
+    print("\nCreating training configuration...")
+    config = create_training_config(data_dir, model_path)
     
     # Start training
-    # print("\nStarting training...")
-    # start_training()
+    print("\nStarting training...")
+    start_training()
     
     # Setup inference
     # print("\nSetting up inference...")
