@@ -2,8 +2,8 @@ batch_size: 1
 ckpt_freq: 100
 data:
   data: null
-  eval_instruct_data: C:\Users\Andres.DESKTOP-D77KM25\Documents\Legal_tech_projects\Mistral-Finetune\mistral-finetune\data\ultrachat_chunk_eval.jsonl
-  instruct_data: C:\Users\Andres.DESKTOP-D77KM25\Documents\Legal_tech_projects\Mistral-Finetune\mistral-finetune\data\ultrachat_chunk_train.jsonl
+  eval_instruct_data: /Users/Andres.DESKTOP-D77KM25/Documents/Legal_tech_projects/Mistral-Finetune/mistral-finetune/data/ultrachat_chunk_eval.jsonl
+  instruct_data: /Users/Andres.DESKTOP-D77KM25/Documents/Legal_tech_projects/Mistral-Finetune/mistral-finetune/data/ultrachat_chunk_train.jsonl
 eval_freq: 200
 log_freq: 1
 lora:

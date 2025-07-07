@@ -14,7 +14,7 @@ import yaml
 import shutil
 import pprint
 import subprocess
-from pathlib import Path
+from pathlib import Path, WindowsPath
 from dotenv import load_dotenv
 from huggingface_hub import login, snapshot_download
 from mistral_inference.transformer import Transformer
@@ -132,12 +132,14 @@ def reformat_data(data_dir):
 def create_training_config(data_dir, model_path):
     """Create training configuration YAML file."""
     print("Creating training configuration...")
-    
+    breakpoint()
+    instruct_data_relative_dir = data_dir.relative_to('c:/')
+    model_path_relative_dir = model_path.relative_to('c:/')
     config = {
         "data": {
-            "instruct_data": str(data_dir / "ultrachat_chunk_train.jsonl"),
+            "instruct_data": "/Users/Andres.DESKTOP-D77KM25/Documents/Legal_tech_projects/Mistral-Finetune/mistral-finetune/data/ultrachat_chunk_train.jsonl",#str(instruct_data_relative_dir / "ultrachat_chunk_train.jsonl"),
             "data": None,  #"/content/drive/My Drive/Mistral/Data/output.jsonl",  # Optional pretraining data
-            "eval_instruct_data": str(data_dir / "ultrachat_chunk_eval.jsonl")
+            "eval_instruct_data": "/Users/Andres.DESKTOP-D77KM25/Documents/Legal_tech_projects/Mistral-Finetune/mistral-finetune/data/ultrachat_chunk_eval.jsonl",#str(instruct_data_relative_dir / "ultrachat_chunk_eval.jsonl")
         },
         "model_id_or_path": str(model_path),
         "lora": {
@@ -191,7 +193,7 @@ def start_training():
         
         # Try direct Python execution instead of torchrun
         try:
-            print("Attempting direct Python execution...")
+            print("\nAttempting direct Python execution...")
             os.system('python -m train example.yaml')
         except Exception as e:
             print(f"Direct execution failed: {e}")
@@ -211,6 +213,7 @@ def start_training():
     else:
         # For non-Windows systems, use normal torchrun
         try:
+            print("\nTraining with torchrun...")
             os.system('torchrun --nproc-per-node=1 -m train example.yaml')
         except Exception as e:
             print(f"Training failed: {e}")
@@ -329,7 +332,7 @@ def main():
     data_dir = Path.cwd().joinpath('data')
     
     # Reformat data (uncomment if needed)
-    print("\nReformatting data...")
+    # print("\nReformatting data...")
     # reformat_data(data_dir)
 
     # Create training configuration

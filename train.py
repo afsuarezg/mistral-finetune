@@ -6,6 +6,7 @@ import pprint
 from contextlib import ExitStack
 from pathlib import Path
 from typing import TYPE_CHECKING
+import shutil
 
 import fire
 import torch.cuda
@@ -98,6 +99,9 @@ def _train(
 
     if is_torchrun():
         if run_dir.exists():
+            # logger.info(f"Removing existing run directory: {run_dir}")
+            # shutil.rmtree(run_dir)
+
             raise RuntimeError(
                 f"Run dir {run_dir} already exists. Make sure to either rename `run_dir` or remove {run_dir}."
             )
