@@ -3,11 +3,11 @@ ckpt_freq: 100
 data:
   eval_instruct_data: /datadrive/mistral-finetune/data/ultrachat_chunk_eval.jsonl
   instruct_data: /datadrive/mistral-finetune/data/ultrachat_chunk_train.jsonl
-eval_freq: 200
+eval_freq: 2500
 log_freq: 1
 lora:
   rank: 16
-max_steps: 100
+max_steps: 1000
 model_id_or_path: /datadrive/mistral-finetune/mistral_models/7B-v0.3
 no_eval: false
 num_microbatches: 1
@@ -18,4 +18,4 @@ optim:
 run_dir: /datadrive/mistral-finetune/mistral_models/test_ultra
 save_adapters: true
 seed: 0
-seq_len: 4096
+seq_len: 512

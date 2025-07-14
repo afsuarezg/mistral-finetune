@@ -158,12 +158,12 @@ def create_training_config(data_dir, model_path):
         },
         "model_id_or_path": str(model_path),
         "lora": {
-            "rank": 32
+            "rank": 16
         },
-        "seq_len": 8192,
+        "seq_len": 512,
         "batch_size": 1,
-        "num_microbatches": 8,
-        "max_steps": 100,
+        "num_microbatches": 1,
+        "max_steps": 1000,
         "optim": {
             "lr": 1e-5,
             "weight_decay": 0.1,
@@ -171,7 +171,7 @@ def create_training_config(data_dir, model_path):
         },
         "seed": 0,
         "log_freq": 1,
-        "eval_freq": 200,
+        "eval_freq": 2500,
         "no_eval": False,
         "ckpt_freq": 100,
         "save_adapters": True,
