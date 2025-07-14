@@ -158,7 +158,7 @@ def create_training_config(data_dir, model_path):
         },
         "model_id_or_path": str(model_path),
         "lora": {
-            "rank": 64
+            "rank": 32
         },
         "seq_len": 8192,
         "batch_size": 1,

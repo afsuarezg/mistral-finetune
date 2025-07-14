@@ -201,7 +201,7 @@ def _train(
 
     # 8. Load model
     # Define mixed precision
-    param_dtype = torch.bfloat16
+    param_dtype = torch.float16  # Changed from bfloat16 to float16 for T4 compatibility
     optim_dtype = torch.float32
 
     assert args.lora is not None, "`args.lora` should be set to a valid value."
