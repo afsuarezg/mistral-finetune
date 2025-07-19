@@ -340,17 +340,19 @@ def main():
     
     # Download model (uncomment if needed)
     print("\nDownloading model...")
-    # model_path = download_model()
+    model_path = download_model()
     model_path = Path.cwd().joinpath('mistral_models', '7B-v0.3')
     # sys.exit("Stopping execution after model download")
     # Prepare dataset (uncomment if needed)
-    # data_dir = prepare_dataset()
+    data_dir = prepare_dataset()
     print("\nPreparing dataset...")
     data_dir = Path.cwd().joinpath('data')
     # breakpoint()
     # Reformat data (uncomment if needed)
     print("\nReformatting data...")
-    # reformat_data(data_dir)
+    reformat_data(data_dir)
+    # sys.exit("Stopping execution after data reformatting")
+
 
     # Create training configuration
     print("\nCreating training configuration...")
