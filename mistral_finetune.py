@@ -154,6 +154,8 @@ def create_training_config(data_dir, model_path):
     config = {
         "data": {
             "instruct_data": str(instruct_data_relative_dir / "ultrachat_chunk_train.jsonl"),
+            # información en caso de continuar con el pretraining
+            "data_continued_pretraining": str(instruct_data_relative_dir / "data_continued_pretraining/data_continued_pretraining.jsonl"),
             "eval_instruct_data": str(instruct_data_relative_dir / "ultrachat_chunk_eval.jsonl"),
         },
         "model_id_or_path": str(model_path),

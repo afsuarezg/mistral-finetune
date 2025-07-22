@@ -2,6 +2,8 @@ batch_size: 1
 ckpt_freq: 100
 data:
   eval_instruct_data: /datadrive/mistral-finetune/data/ultrachat_chunk_eval.jsonl
+  # información en caso de continuar con el pretraining
+  data_continued_pretraining: /datadrive/mistral-finetune/data/data_continued_pretraining/data_continued_pretraining.jsonl
   instruct_data: /datadrive/mistral-finetune/data/ultrachat_chunk_train.jsonl
 eval_freq: 2500
 log_freq: 1
